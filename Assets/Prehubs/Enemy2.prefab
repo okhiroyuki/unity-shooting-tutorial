@@ -108,6 +108,14 @@ MonoBehaviour:
   m_explosionPrefab: {fileID: 114545814804284632, guid: 154117b95c68b4cc4b9d6f6853d4c6da,
     type: 2}
   m_isFollow: 1
+  m_gemPrefabs:
+  - {fileID: 114699339204986122, guid: b3c128f0cc1534c3a89f8b067d5d162f, type: 2}
+  - {fileID: 114733053662097768, guid: 8ce6c40cde86747de8b73ec47515160a, type: 2}
+  - {fileID: 114000485088726696, guid: 78a310a2c190d4e28aa3c790692b7c8f, type: 2}
+  - {fileID: 114876671989683456, guid: 5f004b312f0394dbaa43028f5e8f30c5, type: 2}
+  m_gemSpeedMin: 0.0125
+  m_gemSpeedMax: 0.0875
+  m_deathClip: {fileID: 8300000, guid: d9875487f16b846b8a5024a745ea885a, type: 3}
 --- !u!212 &212675350273916806
 SpriteRenderer:
   m_ObjectHideFlags: 1

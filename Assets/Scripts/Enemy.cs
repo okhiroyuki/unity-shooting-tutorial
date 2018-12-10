@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 // 敵の出現位置の種類
 public enum RESPAWN_TYPE
@@ -24,6 +25,10 @@ public class Enemy : MonoBehaviour {
     private Vector3 m_direction; // 進行方向
 	public Explosion m_explosionPrefab; // 爆発エフェクトのプレハブ
 	public bool m_isFollow; // プレイヤーを追尾する場合 true
+	public Gem[] m_gemPrefabs; // 宝石のプレハブを管理する配列
+	public float m_gemSpeedMin; // 生成する宝石の移動の速さ（最小値）
+	public float m_gemSpeedMax; // 生成する宝石の移動の速さ（最大値）
+	public AudioClip m_deathClip; // 敵を倒した時に再生する SE
 
     // 敵が生成された時に呼び出される関数
     private void Start()
@@ -126,8 +131,45 @@ public class Enemy : MonoBehaviour {
 			// 敵の HP がまだ残っている場合はここで処理を終える
 			if ( 0 < m_hp ) return;
 
+			// 敵を倒した時の SE を再生する
+			var audioSource = FindObjectOfType<AudioSource>();
+			audioSource.PlayOneShot( m_deathClip );
+
+
 			// 敵を削除する
 			Destroy( gameObject );
+			/*
+			* 敵が死亡した場合は宝石を散らばらせる
+			*
+			* 例えば、敵を倒した時に獲得できる経験値が 4 で、
+			* 経験値を 1 獲得できる宝石 A と、経験値を 2 獲得できる宝石 B が存在する場合、
+			*
+			* 1. 宝石 A を 4 個
+			* 2. 宝石 A を 2 個、宝石 B を 1 個
+			* 3. 宝石 B を 2 個
+			*
+			* のいずれかのパターンで宝石が散らばる
+			*/
+			var exp = m_exp;
+
+			while ( 0 < exp )
+			{
+				// 生成可能な宝石を配列で取得する
+				var gemPrefabs = m_gemPrefabs.Where( c => c.m_exp <= exp ).ToArray();
+
+				// 生成可能な宝石の配列から、生成する宝石をランダムに決定する
+				var gemPrefab = gemPrefabs[ Random.Range( 0, gemPrefabs.Length ) ];
+
+				// 敵の位置に宝石を生成する
+				var gem = Instantiate(
+					gemPrefab, transform.localPosition, Quaternion.identity );
+
+				// 宝石を初期化する
+				gem.Init( m_exp, m_gemSpeedMin, m_gemSpeedMax );
+
+				// まだ宝石を生成できるかどうか計算する
+				exp -= gem.m_exp;
+			}
 		}
 	}
 }
